@@ -33,7 +33,7 @@ distributions = {
 
   :lucid64 => {
     :url      => 'http://files.vagrantup.com/lucid64.box',
-    :run_list => %w| minitest-handler apt java vim nginx monit elasticsearch elasticsearch::proxy_nginx elasticsearch::plugin_aws |,
+    :run_list => %w| apt java vim monit elasticsearch |,
     :ip       => '33.33.33.10',
     :primary  => false,
     :node     => {}
