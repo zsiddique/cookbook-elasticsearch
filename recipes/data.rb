@@ -14,13 +14,14 @@ node.elasticsearch[:data][:devices].each do |device, params|
   # Create directory with proper permissions
   #
   directory params[:mount_path] do
-    owner node.elasticsearch[:user] and group node.elasticsearch[:user] and mode 0775
+    owner node.elasticsearch[:user] and group node.elasticsearch[:user] and mode 0755
     recursive true
   end
 
   # Mount device to elasticsearch data path
   #
-  mount params[:mount_path] do
+  mount "#{device}-to-#{params[:mount_path]}" do
+    mount_point params[:mount_path]
     device  device
     fstype  params[:file_system]
     options params[:mount_options]
@@ -36,7 +37,7 @@ node.elasticsearch[:data][:devices].each do |device, params|
   # Ensure proper permissions
   #
   directory params[:mount_path] do
-    owner node.elasticsearch[:user] and group node.elasticsearch[:user] and mode 0775
+    owner node.elasticsearch[:user] and group node.elasticsearch[:user] and mode 0755
     recursive true
   end
 end

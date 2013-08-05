@@ -1,20 +1,20 @@
 [Chef::Recipe, Chef::Resource].each { |l| l.send :include, ::Extensions }
 
-# Install the Fog gem for Chef
+# Install the Fog gem dependencies
 #
-
-fog_pkgs = value_for_platform(
-  "default" => ["libxslt1-dev","libxml2-dev"]
-)
-
-fog_pkgs.each do |pkg|
-  p =  package pkg do
-    action :nothing
-  end
-  p.run_action(:upgrade)
+value_for_platform_family(
+  [:ubuntu, :debian]               => %w| build-essential libxslt1-dev libxml2-dev |,
+  [:rhel, :centos, :suse, :amazon] => %w| gcc gcc-c++ make libxslt-devel libxml2-devel |
+).each do |pkg|
+  package(pkg) { action :nothing }.run_action(:upgrade)
 end
 
-chef_gem("fog") { action :install }
+# Install the Fog gem for Chef run
+#
+chef_gem("fog") do
+  version '1.12.1'
+  action :install
+end
 
 # Create EBS for each device with proper configuration
 #

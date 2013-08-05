@@ -8,9 +8,16 @@
 # config:      <%= node[:elasticsearch][:path][:conf] %>/elasticsearch.yml
 
 # Source networking configuration
+#
 if [ -f /etc/sysconfig/network ]; then source /etc/sysconfig/network; fi
 
+# Set limits for environments ignoring `/etc/security/limits.d`
+#
+ulimit -n <%= node[:elasticsearch][:limits][:nofile] %>
+ulimit -l <%= node[:elasticsearch][:limits][:memlock] %>
+
 # Exit if networking is not up
+#
 [ "$NETWORKING" = "no" ] && exit
 
 PIDFILE='<%= node.elasticsearch[:pid_file] %>'
@@ -32,7 +39,11 @@ start() {
     fi
 
     echo -e "\033[1mStarting elasticsearch...\033[0m"
+    <% if node.platform_family == 'debian' %>
+    ES_INCLUDE=$ES_INCLUDE start-stop-daemon --background --start --quiet --pidfile $PIDFILE --chuid <%= node[:elasticsearch][:user] %> --exec /usr/local/bin/elasticsearch -- -p $PIDFILE
+    <% else %>
     su <%= node[:elasticsearch][:user] %> -c "ES_INCLUDE=$ES_INCLUDE /usr/local/bin/elasticsearch -p $PIDFILE"
+    <% end %>
 
     return $?
 }
